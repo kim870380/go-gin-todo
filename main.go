@@ -2,27 +2,29 @@ package main
 
 import (
 	"fmt"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+	_ "github.com/go-sql-driver/mysql"
 	"todo/config"
 	"todo/models"
 	"todo/routes"
+	"xorm.io/xorm"
 )
 
 var err error
 
 func main() {
 	dsn := config.DbURL(config.BuildDBConfig())
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	//db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	config.DB, err = xorm.NewEngine("mysql", dsn)
 	if err != nil {
 		fmt.Println("status", err)
 	}
 
-	config.DB = db
-
+	/* grom
 	config.DB.AutoMigrate(&models.Todo{})
-
-	//db.Create(&models.Todo{Title: "test", Description: "test"})
+	*/
+	if err = config.DB.Sync2(new(models.Todo)); err != nil {
+		fmt.Println("status", err)
+	}
 
 	r := routes.SetupRouter()
 

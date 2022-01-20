@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"todo/models"
@@ -44,7 +45,14 @@ func CreateTodo(c *gin.Context) {
 func UpdateTodo(c *gin.Context) {
 	var todo models.Todo
 	id := c.Params.ByName("id")
-	err := models.UpdateTodo(&todo, id)
+
+	var params []string
+	title := c.PostForm("title")
+	fmt.Println("title", title)
+
+	params = append(params, title)
+
+	err := models.UpdateTodo(&todo, id, params)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
